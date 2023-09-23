@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".MainActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingTop="40dp"
+        android:paddingRight="30dp"
+        android:paddingLeft="30dp"
+        android:paddingBottom="10dp"
+        android:layout_gravity="center"
+        android:orientation="vertical">
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:layout_gravity="center"
+            android:paddingTop="10dp"
+            android:paddingBottom="10dp"
+            android:orientation="vertical">
+
+            <ImageView
+                android:layout_width="150dp"
+                android:layout_height="150dp"
+                android:layout_marginBottom="20dp"
+                android:layout_gravity="center"
+                android:src="@drawable/account"/>
+
+            <TextView
+                android:id="@+id/profile_username"
+                android:gravity="center"
+                android:layout_width="match_parent"
+                android:layout_height="30dp"
+                android:textSize="25dp"
+                android:layout_gravity="center"
+                android:inputType="textCapWords"
+                android:text="Username"/>
+            <TextView
+                android:id="@+id/profile_email"
+                android:gravity="center"
+                android:layout_width="match_parent"
+                android:layout_height="30dp"
+                android:textSize="20dp"
+                android:layout_gravity="center"
+                android:inputType="textEmailAddress"
+                android:text="Email"/>
+
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:layout_gravity="center"
+            android:paddingTop="10dp"
+            android:paddingBottom="5dp"
+            android:orientation="vertical">
+
+            <Button
+                android:id="@+id/btn_UpdateProfile"
+                android:layout_width="match_parent"
+                android:layout_height="70dp"
+                android:backgroundTint="#0066FF"
+                android:text="Updte Profile "
+                />
+
+            <Button
+                android:id="@+id/btn_DeleteAccount"
+                android:layout_width="match_parent"
+                android:layout_height="70dp"
+                android:backgroundTint="#0066FF"
+                android:text="Delete Account "
+                />
+
+            <Button
+                android:id="@+id/btn_Exit"
+                android:layout_width="match_parent"
+                android:layout_height="70dp"
+                android:backgroundTint="#0066FF"
+                android:text="Exit "
+                />
+
+            <Button
+                android:id="@+id/btn_BackToDashboard"
+                android:layout_width="match_parent"
+                android:layout_height="70dp"
+                android:backgroundTint="#0066FF"
+                android:text="Back "
+                />
+
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+
+
+</LinearLayout>
