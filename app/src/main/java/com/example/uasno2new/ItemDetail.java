@@ -1,14 +1,21 @@
 package com.example.uasno2new;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import androidx.appcompat.app.AppCompatActivity;
+
+import com.example.uasno2new.Model.ItemHistory;
+import com.example.uasno2new.Model.ItemList;
+
+import java.time.LocalDate;
+import java.time.LocalTime;
 
 public class ItemDetail extends AppCompatActivity {
 
@@ -20,11 +27,19 @@ public class ItemDetail extends AppCompatActivity {
 
     TextView NameAndSize, Price;
 
+    DBHelper dbHelper;
+
+    SharedPreferences sharedPreferences;
+    private static final String SHARED_PREF_NAME = "userSignIn";
+
+
     @SuppressLint({"MissingInflatedId"})
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_item_detail);
+
+        dbHelper = new DBHelper(this);
 
         back = findViewById(R.id.btn_ToDashboard);
         view_profile = findViewById(R.id.view_profile);
@@ -49,21 +64,22 @@ public class ItemDetail extends AppCompatActivity {
             }
         });
 
-        int imageId = getIntent().getIntExtra("ImageSource", 0);
-        Image.setImageResource(imageId);
-        NameAndSize.setText(getIntent().getExtras().getString("NameAndSize"));
+        ItemList item = (ItemList) getIntent().getParcelableExtra("item");
 
-        // Mengambil data dari Intent
-        String priceString = getIntent().getExtras().getString("Price");
+        Image.setImageResource(item.get_imageSource());
+        NameAndSize.setText(item.get_nameItemAndSize());
+        Price.setText("Rp" + String.format("%,d", item.get_price()).replace(",", ".") + ",00");
 
-        // Mengubah string harga menjadi angka
-        int price = Integer.parseInt(priceString);
-
-        // Mengubah angka menjadi format rupiah
-        String hargaRupiah = "Rp" + String.format("%,d", price).replace(",", ".") + ",00";
-
-        // Menampilkan harga dalam format rupiah
-        Price.setText(hargaRupiah);
+        buy.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(ItemDetail.this, BuyActivity.class);
+                sharedPreferences = getSharedPreferences(SHARED_PREF_NAME, MODE_PRIVATE);
+                Integer IdUser = sharedPreferences.getInt("id", 0);
+                dbHelper.insertHistory(new ItemHistory(0, IdUser, item, LocalDate.now(), LocalTime.now()));
+                startActivity(intent);
+            }
+        });
 
     }
 }

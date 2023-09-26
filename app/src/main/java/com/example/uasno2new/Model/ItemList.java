@@ -1,6 +1,9 @@
 package com.example.uasno2new.Model;
 
-public class ItemList {
+import android.os.Parcel;
+import android.os.Parcelable;
+
+public class ItemList implements Parcelable{
 
         private Integer _idItem;
 
@@ -46,4 +49,43 @@ public class ItemList {
         public void set_price(Integer _price){
             this._price = _price;
         }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeValue(this._idItem);
+        dest.writeValue(this._imageSource);
+        dest.writeString(this._nameItemAndSize);
+        dest.writeValue(this._price);
+    }
+
+    public void readFromParcel(Parcel source) {
+        this._idItem= (Integer) source.readValue(Integer.class.getClassLoader());
+        this._imageSource = (Integer) source.readValue(Integer.class.getClassLoader());
+        this._nameItemAndSize= source.readString();
+        this._price = (Integer) source.readValue(Integer.class.getClassLoader());
+    }
+
+    protected ItemList(Parcel in) {
+        this._idItem = (Integer) in.readValue(Integer.class.getClassLoader());
+        this._imageSource = (Integer) in.readValue(Integer.class.getClassLoader());
+        this._nameItemAndSize = in.readString();
+        this._price = (Integer) in.readValue(Integer.class.getClassLoader());
+    }
+
+    public static final Parcelable.Creator<ItemList> CREATOR = new Parcelable.Creator<ItemList>() {
+        @Override
+        public ItemList createFromParcel(Parcel source) {
+            return new ItemList(source);
+        }
+
+        @Override
+        public ItemList[] newArray(int size) {
+            return new ItemList[size];
+        }
+    };
 }

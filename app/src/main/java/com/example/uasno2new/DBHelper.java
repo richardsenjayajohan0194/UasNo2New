@@ -6,8 +6,12 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import com.example.uasno2new.Model.ItemHistory;
 import com.example.uasno2new.Model.ItemList;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 
 public class DBHelper extends SQLiteOpenHelper {
@@ -27,7 +31,14 @@ public class DBHelper extends SQLiteOpenHelper {
     public static final String COL_IMAGE = "image";
     public static final String COL_ITEM_NAME_AND_SIZE = "itemNameAndSize";
     public static final String COL_PRICE = "price";
-    private String username;
+
+    //HISTORY
+    public static final String TABLE_NAME_HISTORY = "historys";
+    public static final String COL_ID_HISTORY = "id_history";
+    public static final String COL_ID_USER_HISTORY = "id_users";
+    public static final String COL_ID_ITEM_HISTORY = "id_item";
+    public static final String COL_DATE_HISTORY = "date";
+    public static final String COL_TIME_HISTORY = "time";
 
 
     public DBHelper(Context context) {
@@ -46,15 +57,23 @@ public class DBHelper extends SQLiteOpenHelper {
                 COL_IMAGE + " TEXT NOT NULL," +
                 COL_ITEM_NAME_AND_SIZE + " TEXT NOT NULL," +
                 COL_PRICE + " TEXT NOT NULL)";
+        String CREATE_TABLE_HISTORY = "CREATE TABLE IF NOT EXISTS " + TABLE_NAME_HISTORY + "(" +
+                COL_ID_HISTORY+ " INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL," +
+                COL_ID_USER_HISTORY + " INTEGER NOT NULL," +
+                COL_ID_ITEM_HISTORY + " INTEGER NOT NULL," +
+                COL_DATE_HISTORY + " DATE NOT NULL," +
+                COL_TIME_HISTORY+ " TIME NOT NULL)";
 
         sqLiteDatabase.execSQL(CREATE_TABLE_USER);
         sqLiteDatabase.execSQL(CREATE_TABLE_ITEM);
+        sqLiteDatabase.execSQL(CREATE_TABLE_HISTORY);
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase sqLiteDatabase, int oldVersion, int newVersion) {
          sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + TABLE_NAME_USER);
          sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + TABLE_NAME_ITEM);
+         sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + TABLE_NAME_HISTORY);
     }
 
     //Insert data at SignUp or registration form
@@ -129,6 +148,26 @@ public class DBHelper extends SQLiteOpenHelper {
         return 1;
     }
 
+    //Cari item
+    public ItemList searchItem(Integer id){
+        SQLiteDatabase db = getReadableDatabase();
+
+        // String query = "SELECT * FROM " + TABLE_NAME_ITEM + " WHERE " + KEY_ITEM_ID + "=?";
+        String query = "SELECT * FROM " + TABLE_NAME_ITEM + " WHERE " + COL_ID_ITEM + "=" + id;
+        // Cursor cursor = db.rawQuery(query, new String[]{id.toString()});
+        Cursor cursor = db.rawQuery(query, null);
+        ItemList item = null;
+        if(cursor.moveToFirst()){
+            item = new ItemList(
+                    cursor.getInt(0),
+                    cursor.getInt(1),
+                    cursor.getString(2),
+                    cursor.getInt(3)
+            );
+        }
+        return item;
+    }
+
     public ArrayList<ItemList> getItems(){
         ArrayList<ItemList> arrItem = new ArrayList<>();
         SQLiteDatabase db = getReadableDatabase();
@@ -154,4 +193,65 @@ public class DBHelper extends SQLiteOpenHelper {
         }
         return arrItem;
     }
+
+    public long insertHistory(ItemHistory itemHistory) {
+        SQLiteDatabase db = getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+        //akses item history -> get_Item() (ada di file ItemHistory) -> get_idItem() (ada di file ItemList) buat ambil value dari id itemnya
+        values.put(COL_ID_ITEM_HISTORY, itemHistory.get_Item().get_idItem());
+        values.put(COL_ID_USER_HISTORY, itemHistory.get_IdUser());
+        values.put(COL_DATE_HISTORY, itemHistory.get_Date().toString());
+        values.put(COL_TIME_HISTORY, itemHistory.get_Time().toString());
+
+        if(db.insert(TABLE_NAME_HISTORY, null, values) == -1){
+            db.close();
+            return -1;
+        }
+        db.close();
+        return 1;
+
+    }
+
+    public ArrayList<ItemHistory> get_History(Integer userId){
+        SQLiteDatabase db = getReadableDatabase();
+        ArrayList<ItemHistory> arrHistory = new ArrayList<>();
+
+        String query = "SELECT * FROM " + TABLE_NAME_HISTORY + " WHERE " + COL_ID_USER_HISTORY + "=?" + " ORDER BY " + COL_ID_HISTORY + " DESC";
+        Cursor cursor = db.rawQuery(query, new String[]{userId.toString()});
+        if(cursor.moveToFirst()){
+            arrHistory.add(new ItemHistory(
+                    cursor.getInt(0),
+                    cursor.getInt(1),
+                    searchItem(cursor.getInt(2)),
+                    formatDate(cursor.getString(3)),
+                    formatTime(cursor.getString(4))
+
+            ));
+            while(cursor.moveToNext()){
+                arrHistory.add(new ItemHistory(
+                        cursor.getInt(0),
+                        cursor.getInt(1),
+                        searchItem(cursor.getInt(2)),
+                        formatDate(cursor.getString(3)),
+                        formatTime(cursor.getString(4))
+                ));
+            }
+        }
+        return arrHistory;
+    }
+
+    private LocalTime formatTime(String localTime) {
+        DateTimeFormatter formatter = DateTimeFormatter.ISO_LOCAL_TIME;
+        LocalTime formattedTime = LocalTime.parse(localTime, formatter);
+        return LocalTime.from(formattedTime);
+    }
+
+    private LocalDate formatDate(String localDate) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        LocalDate formattedDate = LocalDate.parse(localDate,formatter);
+        return LocalDate.from(formattedDate);
+    }
+
+
 }

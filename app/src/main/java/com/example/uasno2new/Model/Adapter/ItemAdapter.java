@@ -1,12 +1,12 @@
 package com.example.uasno2new.Model.Adapter;
 
 import android.content.Intent;
+import android.os.Parcelable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -17,7 +17,13 @@ import com.example.uasno2new.R;
 
 import java.util.ArrayList;
 
-public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.myViewHolder>{
+interface onClickItem{
+    void ClickItem(View view, int position);
+}
+
+public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.myViewHolder> implements onClickItem {
+
+
 
     ArrayList<ItemList> listItem;
 
@@ -45,10 +51,7 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.myViewHolder>{
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(view.getContext(), ItemDetail.class);
-//                  Toast.makeText(view.getContext(), "Selected Items: " + item.get_nameItemAndSize(), Toast.LENGTH_LONG).show();
-                intent.putExtra("ImageSource", listItem.get(position).get_imageSource());
-                intent.putExtra("NameAndSize", String.valueOf(listItem.get(position).get_nameItemAndSize()));
-                intent.putExtra("Price", String.valueOf(listItem.get(position).get_price()));
+                intent.putExtra("item", (Parcelable) listItem.get(position));
                 view.getContext().startActivity(intent);
             }
         });
@@ -57,6 +60,13 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.myViewHolder>{
     @Override
     public int getItemCount() {
         return listItem.size();
+    }
+
+    @Override
+    public void ClickItem(View view, int position) {
+        Intent intent = new Intent(view.getContext(), ItemDetail.class);
+        intent.putExtra("item", (Parcelable) listItem.get(position));
+        view.getContext().startActivity(intent);
     }
 
     public static class myViewHolder extends RecyclerView.ViewHolder {
